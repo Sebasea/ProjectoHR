@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmpleadoController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrmanament</a> &gt; <a href="index.source.html" class="el_package">com.hrManagement.controller</a> &gt; <span class="el_source">EmpleadoController.java</span></div><h1>EmpleadoController.java</h1><pre class="source lang-java linenums">package com.hrManagement.controller;
+
+import com.hrManagement.controller.dto.EmpleadoDTO;
+import com.hrManagement.logica.PerfilEmpleadoLogica;
+import com.hrManagement.logica.RolEnum;
+import com.hrManagement.modelo.Empleado;
+import com.hrManagement.logica.EmpleadoLogica;
+import com.hrManagement.repository.EmpleadoRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping(&quot;/empleados&quot;) // Establecemos una ruta base para todos los endpoints
+public class EmpleadoController {
+
+    private final EmpleadoLogica empleadoLogica;
+
+    private final EmpleadoRepository empleadoRepository;
+<span class="fc" id="L22">    public EmpleadoController(EmpleadoLogica empleadoLogica, EmpleadoRepository empleadoRepository) {</span>
+<span class="fc" id="L23">        this.empleadoLogica = empleadoLogica;</span>
+<span class="fc" id="L24">        this.empleadoRepository = empleadoRepository;</span>
+<span class="fc" id="L25">    }</span>
+
+    @PostMapping(&quot;/agregar&quot;)
+    public ResponseEntity&lt;String&gt; agregarEmpleado(@RequestBody EmpleadoDTO empleadoDTO) {
+<span class="fc" id="L29">        boolean guardado = empleadoLogica.guardarEmpleado(empleadoDTO);</span>
+<span class="pc bpc" id="L30" title="1 of 2 branches missed.">        if (guardado) {</span>
+<span class="fc" id="L31">            return ResponseEntity.status(HttpStatus.CREATED).body(&quot;Empleado agregado correctamente&quot;);</span>
+        } else {
+<span class="nc" id="L33">            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;No se pudo agregar el empleado&quot;);</span>
+        }
+    }
+
+    @GetMapping(&quot;/{id}&quot;)
+    public ResponseEntity&lt;Empleado&gt; obtenerDatosEmpleadoPorID(@PathVariable int codigo) {
+<span class="fc" id="L39">        Empleado empleado = empleadoLogica.obtenerEmpleadoPorID(codigo);</span>
+<span class="pc bpc" id="L40" title="1 of 2 branches missed.">        if (empleado != null) {</span>
+<span class="fc" id="L41">            return ResponseEntity.ok(empleado);</span>
+        } else {
+<span class="nc" id="L43">            return ResponseEntity.notFound().build();</span>
+        }
+    }
+
+    @GetMapping
+    public List&lt;Empleado&gt; obtenerEmpleadosPorCargo(@RequestParam Enum rol) {
+<span class="fc" id="L49">        return empleadoLogica.obtenerEmpleadosPorCargo(RolEnum.valueOf(String.valueOf(rol)));</span>
+    }
+
+    @GetMapping(&quot;/todos&quot;)
+    public List&lt;Empleado&gt; obtenerTodosLosEmpleados() {
+<span class="fc" id="L54">        return empleadoLogica.obtenerTodosLosEmpleados();</span>
+    }
+    @PutMapping(&quot;/modificar/{codigo}&quot;)
+    public ResponseEntity&lt;String&gt; modificarEmpleado(@PathVariable int codigo, @RequestBody EmpleadoDTO empleadoActualizado) {
+<span class="fc" id="L58">        boolean modificado = empleadoLogica.modificarEmpleado(codigo, empleadoActualizado);</span>
+<span class="pc bpc" id="L59" title="1 of 2 branches missed.">        if (modificado) {</span>
+<span class="fc" id="L60">            return ResponseEntity.ok(&quot;Empleado actualizado correctamente&quot;);</span>
+        } else {
+<span class="nc" id="L62">            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(&quot;Empleado no encontrado&quot;);</span>
+        }
+    }
+    @DeleteMapping(&quot;/eliminar/{codigo}&quot;)
+    public ResponseEntity&lt;String&gt; eliminarEmpleado(@PathVariable int codigo) {
+        try {
+<span class="fc" id="L68">            boolean resultado = empleadoLogica.eliminarEmpleado(codigo);</span>
+<span class="pc bpc" id="L69" title="1 of 2 branches missed.">            if (resultado) {</span>
+<span class="fc" id="L70">                return ResponseEntity.ok(&quot;Empleado desactivado correctamente&quot;);</span>
+            } else {
+<span class="nc" id="L72">                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(&quot;No se pudo desactivar al empleado.&quot;);</span>
+            }
+<span class="nc" id="L74">        } catch (PerfilEmpleadoLogica.EmpleadoNoExisteException e) {</span>
+<span class="nc" id="L75">            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(&quot;No se puede desactivar el empleado ya que no existe.&quot;);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>

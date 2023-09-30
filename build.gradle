@@ -1,0 +1,65 @@
+plugins {
+	id 'java'
+	id 'jacoco'
+	id 'org.springframework.boot' version '2.7.15'
+	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id 'info.solidsoft.pitest' version '1.9.0'
+	id 'org.springdoc.openapi-gradle-plugin' version '1.7.0'
+}
+
+group = 'com.hrManagement'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '17'
+}
+
+
+repositories {
+	mavenCentral()
+}
+pitest {
+	junit5PluginVersion = '1.0.0'
+	excludedClasses = [
+			'com.hrManagement.controller.dto.**',
+			'com.hrManagement.modelo.**',
+	]
+}
+dependencies {
+	implementation("org.springframework.boot:spring-boot-starter-web")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
+	testImplementation("com.h2database:h2:2.2.220")
+	implementation("org.springframework.data:spring-data-jpa:2.7.15")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	implementation(implementation 'mysql:mysql-connector-java:8.0.28')
+	implementation ('org.springdoc:springdoc-openapi-webmvc-core:1.7.0')
+	implementation 'org.springdoc:springdoc-openapi-ui:1.7.0'
+
+}
+
+test {
+	useJUnitPlatform()
+	finalizedBy jacocoTestReport
+}
+
+jacoco {
+	toolVersion = "0.8.8"
+}
+
+
+jacocoTestReport {
+	dependsOn test
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+					'com/hrManagement/modelo/*',
+					'com/hrManagement/controller/dto'
+			])
+		}))
+	}
+}
+tasks.named('test') {
+	useJUnitPlatform()
+}

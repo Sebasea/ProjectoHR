@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmpleadoLogica.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">hrmanament</a> &gt; <a href="index.source.html" class="el_package">com.hrManagement.logica</a> &gt; <span class="el_source">EmpleadoLogica.java</span></div><h1>EmpleadoLogica.java</h1><pre class="source lang-java linenums">package com.hrManagement.logica;
+
+import com.hrManagement.controller.dto.EmpleadoDTO;
+import com.hrManagement.modelo.Empleado;
+import com.hrManagement.repository.EmpleadoRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class EmpleadoLogica {
+
+    private final EmpleadoRepository empleadoRepository;
+
+<span class="fc" id="L16">    public EmpleadoLogica(EmpleadoRepository empleadoRepository) {</span>
+<span class="fc" id="L17">        this.empleadoRepository = empleadoRepository;</span>
+<span class="fc" id="L18">    }</span>
+
+    public boolean guardarEmpleado(EmpleadoDTO empleadoDTO) {
+<span class="fc bfc" id="L21" title="All 2 branches covered.">        if (empleadoRepository.findById(empleadoDTO.getCodigo()).isPresent()) {</span>
+<span class="fc" id="L22">            return false; // El empleado ya existe, no se puede guardar de nuevo</span>
+        }
+
+<span class="fc" id="L25">        Empleado empleado = new Empleado();</span>
+<span class="fc" id="L26">        empleado.setCodigo(empleadoDTO.getCodigo());</span>
+<span class="fc" id="L27">        empleado.setNombre(empleadoDTO.getNombre());</span>
+<span class="fc" id="L28">        empleado.setEdad(empleadoDTO.getEdad());</span>
+<span class="fc" id="L29">        empleado.setRol(RolEnum.valueOf(empleadoDTO.getRol().name()));</span>
+<span class="fc" id="L30">        empleado.setEmail(empleadoDTO.getEmail());</span>
+<span class="fc" id="L31">        empleado.setNumeroTelefonico(empleadoDTO.getNumeroTelefonico());</span>
+<span class="fc" id="L32">        empleado.setResponsabilidades(empleado.getResponsabilidades());</span>
+<span class="fc" id="L33">        empleado.setEliminar(false);</span>
+
+        try {
+<span class="fc" id="L36">            empleadoRepository.save(empleado);</span>
+<span class="fc" id="L37">            return true; // El empleado se ha guardado exitosamente</span>
+<span class="nc" id="L38">        } catch (Exception e) {</span>
+            // Manejo de errores, puedes personalizarlo segÃºn tus necesidades
+<span class="nc" id="L40">            e.printStackTrace();</span>
+<span class="nc" id="L41">            return false; // Hubo un error al guardar el empleado</span>
+        }
+    }
+
+    public Empleado obtenerEmpleadoPorID(int id) {
+<span class="fc" id="L46">        return empleadoRepository.findById(id).orElse(null);</span>
+    }
+
+    public List&lt;Empleado&gt; obtenerEmpleadosPorCargo(Enum rol) {
+<span class="fc" id="L50">        return empleadoRepository.findByRol(rol);</span>
+    }
+
+    public List&lt;Empleado&gt; obtenerTodosLosEmpleados() {
+<span class="fc" id="L54">        return empleadoRepository.findAll();</span>
+    }
+
+    public boolean modificarEmpleado(int codigo, EmpleadoDTO empleadoActualizado) {
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (empleadoRepository.existsById(codigo)) {</span>
+<span class="fc" id="L59">            Empleado empleado = empleadoRepository.findById(codigo).orElse(null);</span>
+<span class="pc bpc" id="L60" title="1 of 2 branches missed.">            if (empleado != null) {</span>
+                // Actualiza los campos del empleado con los del DTO
+<span class="fc" id="L62">                empleado.setNombre(empleadoActualizado.getNombre());</span>
+<span class="fc" id="L63">                empleado.setEdad(empleadoActualizado.getEdad());</span>
+<span class="fc" id="L64">                empleado.setRol(RolEnum.valueOf(empleadoActualizado.getRol().name()));</span>
+<span class="fc" id="L65">                empleado.setEmail(empleadoActualizado.getEmail());</span>
+<span class="fc" id="L66">                empleado.setNumeroTelefonico(empleadoActualizado.getNumeroTelefonico());</span>
+<span class="fc" id="L67">                empleado.setResponsabilidades(empleadoActualizado.getResponsabilidades());</span>
+<span class="fc" id="L68">                empleadoRepository.save(empleado);</span>
+<span class="fc" id="L69">                return true;</span>
+            }
+        }
+<span class="fc" id="L72">        return false;</span>
+    }
+    public boolean eliminarEmpleado(int codigo) {
+<span class="fc" id="L75">        Optional&lt;Empleado&gt; empleadoOptional = empleadoRepository.findById(codigo);</span>
+<span class="fc" id="L76">        Empleado empleado = new Empleado();</span>
+<span class="fc" id="L77">        empleado.setEliminar(false);</span>
+
+<span class="fc bfc" id="L79" title="All 2 branches covered.">        if (empleadoOptional.isPresent()) {</span>
+<span class="fc" id="L80">            empleado = empleadoOptional.get();</span>
+<span class="fc" id="L81">            empleado.setEliminar(true); // Cambia el valor de la columna &quot;eliminar&quot; a false</span>
+
+            try {
+<span class="fc" id="L84">                empleadoRepository.save(empleado);</span>
+<span class="fc" id="L85">                return true;</span>
+<span class="nc" id="L86">            } catch (Exception e) {</span>
+                // Manejo de errores, puedes personalizarlo segÃºn tus necesidades
+<span class="nc" id="L88">                e.printStackTrace();</span>
+<span class="nc" id="L89">                return false;</span>
+            }
+        }
+
+<span class="fc" id="L93">        return false; // No se encontrÃ³ el empleado con el cÃ³digo dado</span>
+    }
+
+    public static class EmpleadoNoExisteException extends RuntimeException {
+        public EmpleadoNoExisteException() {
+<span class="nc" id="L98">            super(&quot;No existe Empleado&quot;);</span>
+<span class="nc" id="L99">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.9.202303310957</span></div></body></html>
